@@ -7,12 +7,9 @@
 -----------------------------------------------------------------------
 
 ####Dependencies:  
-`
-pkg-config (Should come with most gtk+ builds)  
-libgtk >= 3  
-libjemalloc >= 2 (Though this might be optional)  
-`
+`  pkg-config (Should come with most gtk+ builds)    `  
+`  libgtk >= 3                                       `  
+`  libjemalloc >= 2 (Though this might be optional)  `  
 
 ####Commands to build:  
 `make`
-

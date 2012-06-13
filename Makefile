@@ -4,7 +4,7 @@ CFLAGS = -g -Wall -Wextra -Werror `pkg-config gtk+-3.0 --cflags`
 
 LDFLAGS = -ljemalloc `pkg-config gtk+-3.0 --libs`
 
-SRCS = main.c ppapp.c structs/pptree.c
+SRCS = main.c ppapp.c structs/pptree.c structs/pplist.c
 
 OBJS = $(SRCS:.c=.o)
 

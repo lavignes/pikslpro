@@ -138,4 +138,13 @@ void pp_list_empty(ppList* list);
  */
 size_t pp_list_size(ppList* list);
 
+/**
+ * @fn void pp_list_traverse(ppList* list, void(*fn)(void*, void*), void* data)
+ * @brief Apply a function to every object in the list.
+ * @param list a list handle.
+ * @param fn A function that takes an object and user-data.
+ * @param data the user-data passed to the function.
+ */
+void pp_list_traverse(ppList* list, void(*fn)(void*, void*), void* data);
+
 #endif /* PP_LIST_H */

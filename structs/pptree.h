@@ -81,7 +81,7 @@ void pp_tree_remove(ppTree* tree, char* key);
 void pp_tree_clear(ppTree* tree);
 
 /**
- * @fn void pp_tree_traverse(ppTree* tree, void(*fn)(char*, void*, void*))
+ * @fn void pp_tree_traverse(ppTree* tree, void(*fn)(char*, void*, void*), void* data)
  * @brief Apply a function to every (key, value) tuple in the tree.
  * @param tree a tree handle.
  * @param fn A function that takes a key and reference.

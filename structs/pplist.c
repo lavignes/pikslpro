@@ -298,3 +298,14 @@ size_t pp_list_size(ppList* list) {
   
   return size;
 }
+
+void pp_list_traverse(ppList* list, void(*fn)(void*, void*), void* data) {
+
+  ppListNode* x = list->head;
+  
+  while (x != NULL) {
+  
+    fn(x->value, data);
+    x = x->next;
+  }
+}

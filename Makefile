@@ -1,6 +1,6 @@
 CC = gcc
 
-CFLAGS = -g -Wall -Wextra -Werror `pkg-config gtk+-3.0 --cflags`
+CFLAGS = -g -Wall -Wextra -Werror -Wno-unused-parameter `pkg-config gtk+-3.0 --cflags`
 
 LDFLAGS = -ljemalloc `pkg-config gtk+-3.0 --libs`
 

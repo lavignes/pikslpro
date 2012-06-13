@@ -26,8 +26,9 @@
 #define PP_APP_H
 
 #include <gtk/gtk.h>
-#include <glib/glib.h>
+#include <glib.h>
 
+#include "structs/pptree.h"
 #include "pppiksl.h"
 
 typedef struct ppApp {
@@ -35,6 +36,10 @@ typedef struct ppApp {
   GtkWidget* window;
   
   GList* projects;
+  
+  // Configurable members
+  int win_width;
+  int win_height;
 
 } ppApp;
 

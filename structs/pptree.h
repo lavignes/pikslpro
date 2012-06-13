@@ -81,11 +81,13 @@ void pp_tree_remove(ppTree* tree, char* key);
 void pp_tree_clear(ppTree* tree);
 
 /**
- * @fn void pp_tree_traverse(ppTree* tree, void(*fn)(char*, void*))
+ * @fn void pp_tree_traverse(ppTree* tree, void(*fn)(char*, void*, void*))
  * @brief Apply a function to every (key, value) tuple in the tree.
  * @param tree a tree handle.
  * @param fn A function that takes a key and reference.
+ *        A third pointer is given for user-data.
+ * @param data the user-data passed to the function.
  */
-void pp_tree_traverse(ppTree* tree, void(*fn)(char*, void*));
+void pp_tree_traverse(ppTree* tree, void(*fn)(char*, void*, void*), void* data);
 
 #endif /* PP_TREE_H */

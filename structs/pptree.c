@@ -301,20 +301,21 @@ void pp_tree_clear(ppTree* tree) {
   tree->root = NULL;
 }
 
-static void
-pp_treenode_traverse(ppTreeNode* node, void(*fn)(char*, void*)) {
+static void pp_treenode_traverse(ppTreeNode* node,
+  void(*fn)(char*, void*, void*), void* data) {
 
   if (node->left != NULL)
-    pp_treenode_traverse(node->left, fn);
+    pp_treenode_traverse(node->left, fn, data);
 
-  fn(node->key, node->value);
+  fn(node->key, node->value, data);
 
   if (node->right != NULL)
-    pp_treenode_traverse(node->right, fn);
+    pp_treenode_traverse(node->right, fn, data);
 }
 
-void pp_tree_traverse(ppTree* tree, void(*fn)(char*, void*)) {
+void pp_tree_traverse(ppTree* tree,
+  void(*fn)(char*, void*, void*), void* data) {
 
   if (tree->root != NULL)
-    pp_treenode_traverse(tree->root, fn);
+    pp_treenode_traverse(tree->root, fn, data);
 }

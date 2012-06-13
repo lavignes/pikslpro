@@ -26,17 +26,23 @@
 #define PP_APP_H
 
 #include <gtk/gtk.h>
+#include <glib/glib.h>
 
 #include "pppiksl.h"
 
 typedef struct ppApp {
 
   GtkWidget* window;
+  
+  GList* projects;
 
 } ppApp;
 
 extern ppApp* PP_APP;
 
 void pp_app_init(int argc, char* argv[]);
+
+void pp_app_saveconfig();
+void pp_app_loadconfig();
 
 #endif /* PP_APP_H */

@@ -26,11 +26,13 @@
 
 #include "ppapp.h"
 
+#include "widgets/ppdualpicker.h"
+
 ppApp* PP_APP = NULL;
 
 // watcher for window resizes
 // It works.. :/
-static void resizewatcher(GtkWidget* widget, gpointer data) {
+static void on_resize(GtkWidget* widget, gpointer data) {
   
   gtk_window_get_size(GTK_WINDOW(widget), &PP_APP->win_width,
                                           &PP_APP->win_height);
@@ -51,14 +53,20 @@ void pp_app_init(int argc, char* argv[]) {
   
   gtk_window_set_default_size(GTK_WINDOW(PP_APP->window), PP_APP->win_width,
                                                           PP_APP->win_height);
-
   // Attach a watcher to track the window updates
   // this should catch resize events
   // TODO: Find better way to track resize events
-  g_signal_connect(PP_APP->window, "size_allocate", G_CALLBACK(resizewatcher), NULL);
+  g_signal_connect(PP_APP->window, "size_allocate", G_CALLBACK(on_resize), NULL);
   
-                      
-  gtk_widget_show(PP_APP->window);
+  GtkWidget* picker = pp_dualpicker_new();
+  
+  gtk_container_add(GTK_CONTAINER(PP_APP->window), picker);
+  
+  gtk_widget_show_all(PP_APP->window);
+  
+  GdkWindow* gdkwin = gtk_widget_get_window(PP_APP->window);
+  GdkCursor* cursor = gdk_cursor_new_for_display(gdk_display_get_default(), GDK_PENCIL);
+  gdk_window_set_cursor(gdkwin, cursor);
   
   // Start gtk main thread
   gtk_main();
@@ -111,4 +119,8 @@ void pp_app_loadconfig() {
   g_key_file_free(configfile);
 }
 
+void pp_app_saveconfig() {
+
+  // TODO: Write this... I'm lazy.
+}
 

@@ -18,7 +18,7 @@
  *
  * @section DESCRIPTION
  *
- * Contains all information for a single instance of piksl to run.
+ * Contains all information for a single instance of pikslpro to run.
  *
  */
 

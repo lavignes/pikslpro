@@ -26,10 +26,6 @@
 #define PP_APP_H
 
 #include <gtk/gtk.h>
-#include <glib.h>
-
-#include "structs/pptree.h"
-#include "pppiksl.h"
 
 typedef struct ppApp {
 

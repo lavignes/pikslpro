@@ -4,7 +4,7 @@ CFLAGS = -g -Wall -Wextra -Werror -Wno-unused-parameter `pkg-config gtk+-3.0 --c
 
 LDFLAGS = -ljemalloc `pkg-config gtk+-3.0 --libs`
 
-SRCS = main.c ppapp.c structs/pptree.c widgets/ppdualpicker.c
+SRCS = main.c ppapp.c pplayer.c structs/pptree.c widgets/pppiksl.c
 
 OBJS = $(SRCS:.c=.o)
 

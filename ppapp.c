@@ -26,7 +26,7 @@
 
 #include "ppapp.h"
 
-#include "widgets/ppdualpicker.h"
+#include "widgets/pppiksl.h"
 
 ppApp* PP_APP = NULL;
 
@@ -58,9 +58,9 @@ void pp_app_init(int argc, char* argv[]) {
   // TODO: Find better way to track resize events
   g_signal_connect(PP_APP->window, "size_allocate", G_CALLBACK(on_resize), NULL);
   
-  GtkWidget* picker = pp_dualpicker_new();
+  GtkWidget* piksl = pp_piksl_new();
   
-  gtk_container_add(GTK_CONTAINER(PP_APP->window), picker);
+  gtk_container_add(GTK_CONTAINER(PP_APP->window), piksl);
   
   gtk_widget_show_all(PP_APP->window);
   

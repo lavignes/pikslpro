@@ -1,7 +1,5 @@
 #include <cairo.h>
 
-#include <jemalloc/jemalloc.h>
-
 #include "ppdualpicker.h"
 
 G_DEFINE_TYPE(ppDualPicker, pp_dualpicker, GTK_TYPE_DRAWING_AREA);
@@ -71,7 +69,6 @@ static void pp_dualpicker_init(ppDualPicker* picker) {
 
   gtk_widget_add_events(GTK_WIDGET(picker), GDK_BUTTON_MOTION_MASK
                                             | GDK_BUTTON_PRESS_MASK);
-
 
   picker->surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 800, 600);
                                                         

@@ -1,5 +1,5 @@
 /**
- * @file pplayer.h
+ * @file pppiksl.c
  * @author  Scott LaVigne <scott.lavigne@linux.com>
  * @version 0.0
  *
@@ -18,40 +18,37 @@
  *
  * @section DESCRIPTION
  *
- * Structure for managing pixel data.
+ * A widget for smart color picking
  *
  */
 
-#ifndef PP_LAYER_H
-#define PP_LAYER_H
-
 #include <cairo.h>
-#include <glib.h>
 
-typedef struct ppLayer {
+#include "pppicker.h"
+#include "../ppapp.h"
 
-  int x;
-  int y;
-  
-  int width;
-  int height;
-  
-  double alpha;
-  gboolean visible;
-  
-  cairo_surface_t* surface;
-  guint* data;
+G_DEFINE_TYPE(ppPicker, pp_picker, GTK_TYPE_DRAWING_AREA);
 
-  //Overflow pixel
-  // all erroneous writes to the surface are redirected here
-  guint err_pixel;
+static gboolean pp_picker_draw(GtkWidget* widget, cairo_t* cr) {
 
-} ppLayer;
+  return FALSE;
+}
 
-ppLayer* pp_layer_new(int width, int height);
+static void pp_picker_class_init(ppPickerClass* class) {
 
-void pp_layer_free(ppLayer* layer);
+  GtkWidgetClass* widget_class;
 
-guint* pp_layer_pixel(ppLayer* layer, int x, int y);
+  widget_class = GTK_WIDGET_CLASS(class);
 
-#endif /* PP_LAYER_H */
+  widget_class->draw = pp_picker_draw;
+}
+
+static void pp_picker_init(ppPicker* picker) {
+
+  gtk_widget_add_events(GTK_WIDGET(picker), GDK_BUTTON_PRESS_MASK);
+}
+
+GtkWidget* pp_picker_new() {
+
+  return g_object_new(PP_TYPE_PICKER, NULL);
+}

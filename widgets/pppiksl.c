@@ -40,9 +40,11 @@ static gboolean pp_piksl_draw(GtkWidget* widget, cairo_t* cr) {
   gtk_widget_get_allocation(widget, &piksl->allocinfo);
 
   // Draw the background color
-  cairo_set_source_rgb(cr, piksl->alpha_color & 0x00FF0000,
-                           piksl->alpha_color & 0x0000FF00,
-                           piksl->alpha_color & 0x000000FF);
+  cairo_set_source_rgb(cr, 
+                       piksl->alpha_color & 0x00FF0000,                        
+                       piksl->alpha_color & 0x0000FF00,
+                       piksl->alpha_color & 0x000000FF);
+
   
   cairo_rectangle(cr, 0, 0,
                   piksl->img_width*piksl->zoom,
@@ -62,7 +64,7 @@ static gboolean pp_piksl_draw(GtkWidget* widget, cairo_t* cr) {
   for (i = 0; i < piksl->layers->len; ++i) {
   
     layer = g_ptr_array_index(piksl->layers, i);
-    cairo_set_source_surface(cr, layer->surface, 0, 0);
+    cairo_set_source_surface(cr, layer->surface, layer->x, layer->y);
     
     cairo_paint(cr);
   }
@@ -92,9 +94,12 @@ static gboolean pp_piksl_mouse_motion(GtkWidget* widget,
     while (TRUE) {
     
       // Write the color to the raster array
-      *(layer->data + cairo_image_surface_get_width(layer->surface)
-      * (int)(piksl->lasty/piksl->zoom)
-      + (int)(piksl->lastx/piksl->zoom)) = PP_APP->color1;
+      //*(layer->data + cairo_image_surface_get_width(layer->surface)
+      //* (int)(piksl->lasty/piksl->zoom)
+      //+ (int)(piksl->lastx/piksl->zoom)) = PP_APP->color1;
+
+      *pp_layer_pixel(layer, (int)(piksl->lastx/piksl->zoom),
+                             (int)(piksl->lasty/piksl->zoom)) = PP_APP->color1;
       
       if (piksl->lastx == (int)event->x && piksl->lasty == (int)event->y) break;
       

@@ -29,6 +29,9 @@
 ppLayer* pp_layer_new(int width, int height) {
 
   ppLayer* layer = malloc(sizeof(ppLayer));
+
+  layer->x = 0;
+  layer->y = 0;
   
   layer->width = width;
   layer->height = height;
@@ -38,7 +41,7 @@ ppLayer* pp_layer_new(int width, int height) {
   
   layer->surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
                                                         
-  layer->data = (gint*)cairo_image_surface_get_data(layer->surface);
+  layer->data = (guint*)cairo_image_surface_get_data(layer->surface);
   
   return layer;
 }
@@ -50,4 +53,12 @@ void pp_layer_free(ppLayer* layer) {
     cairo_surface_destroy(layer->surface);
     free(layer);
   }
+}
+
+guint* pp_layer_pixel(ppLayer* layer, int x, int y) {
+
+  if (x < 0 || x >= layer->width || y < 0 || y >= layer->height)
+    return &layer->err_pixel;
+
+  return layer->data + (guint)(cairo_image_surface_get_width(layer->surface) * y + x);
 }

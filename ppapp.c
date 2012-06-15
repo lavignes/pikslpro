@@ -66,6 +66,12 @@ void pp_app_init(int argc, char* argv[]) {
   
   GtkWidget* piksl = pp_piksl_new(800, 600);
   GtkWidget* alignment = gtk_alignment_new(0.5, 0.5, 0, 0);
+  gtk_alignment_set_padding(GTK_ALIGNMENT(alignment),
+                            PP_APP->canvas_padding,
+                            PP_APP->canvas_padding,
+                            PP_APP->canvas_padding,
+                            PP_APP->canvas_padding);
+  
   gtk_container_add(GTK_CONTAINER(alignment), piksl);
   
   GtkWidget* scroller = gtk_scrolled_window_new(NULL, NULL);
@@ -84,14 +90,26 @@ void pp_app_init(int argc, char* argv[]) {
   gtk_toolbar_insert(GTK_TOOLBAR(PP_APP->toolbar), gtk_tool_button_new_from_stock(GTK_STOCK_SAVE), -1);
   gtk_toolbar_insert(GTK_TOOLBAR(PP_APP->toolbar), gtk_separator_tool_item_new(), -1);
 
+  // Add padding to toolbar
+  GtkToolItem* spacer = gtk_separator_tool_item_new();
+  gtk_separator_tool_item_set_draw(GTK_SEPARATOR_TOOL_ITEM(spacer), FALSE);
+  gtk_tool_item_set_expand(spacer, TRUE);
+  gtk_toolbar_insert(GTK_TOOLBAR(PP_APP->toolbar), spacer, -1);
+  
+  gtk_toolbar_insert(GTK_TOOLBAR(PP_APP->toolbar), gtk_tool_button_new_from_stock(GTK_STOCK_PROPERTIES), -1);
+
   gtk_box_pack_start(GTK_BOX(vbox), PP_APP->toolbar, FALSE, FALSE, 0);
-  gtk_box_pack_end(GTK_BOX(vbox), scroller, TRUE, TRUE, 0);
+
+  GtkWidget* pane = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+  gtk_box_pack_end(GTK_BOX(vbox), pane, TRUE, TRUE, 0);
+  
+  gtk_paned_add2(GTK_PANED(pane), scroller);
   
   gtk_container_add(GTK_CONTAINER(PP_APP->window), vbox);
 
   gtk_widget_show_all(PP_APP->window);
-  
-  GdkWindow* gdkwin = gtk_widget_get_window(piksl);
+
+  GdkWindow* gdkwin = gtk_widget_get_window(GTK_WIDGET(piksl));
   GdkCursor* cursor = gdk_cursor_new_for_display(gdk_display_get_default(), GDK_PENCIL);
   gdk_window_set_cursor(gdkwin, cursor);
 
@@ -142,6 +160,9 @@ void pp_app_loadconfig() {
 
   PP_APP->win_height =
     g_key_file_get_integer(configfile, "pikslpro", "win_height", NULL);
+
+  PP_APP->canvas_padding =
+    g_key_file_get_integer(configfile, "pikslpro", "canvas_padding", NULL);
   
   // cleanup :3
   g_string_free(configpath, TRUE);

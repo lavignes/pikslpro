@@ -37,7 +37,8 @@ typedef struct ppApp {
   // Configurable members
   int win_width;
   int win_height;
-
+  int canvas_padding;
+  
 } ppApp;
 
 extern ppApp* PP_APP;

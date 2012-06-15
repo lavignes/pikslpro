@@ -37,9 +37,6 @@
 typedef struct ppPiksl {
 
   GtkDrawingAreaClass parent;
-
-  // Used for drawing the widget
-  GtkAllocation allocinfo;
   
   int img_width;
   int img_height;

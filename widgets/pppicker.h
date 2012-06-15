@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PP_PIKSL_H
-#define PP_PIKSL_H
+#ifndef PP_PICKER_H
+#define PP_PICKER_H
 
 #include <gtk/gtk.h>
 
@@ -37,6 +37,9 @@
 typedef struct ppPicker {
 
   GtkDrawingAreaClass parent;
+
+  // Used for drawing the widget
+  GtkAllocation allocinfo;
   
 } ppPicker;
 

@@ -1,5 +1,10 @@
+# Ignore objects
 *.o
+pikslpro
+
+# Ignore temps
 *~
 .*
-pikslpro
+
+# Ignore project files
 pikslpro.anjuta

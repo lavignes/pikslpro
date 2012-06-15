@@ -31,6 +31,27 @@ G_DEFINE_TYPE(ppPicker, pp_picker, GTK_TYPE_DRAWING_AREA);
 
 static gboolean pp_picker_draw(GtkWidget* widget, cairo_t* cr) {
 
+  ppPicker* picker = PP_PICKER(widget);
+  
+  // Get the widget dimensions
+  gtk_widget_get_allocation(widget, &picker->allocinfo);
+
+  cairo_set_source_rgb(cr, 0, 0, 0);
+  cairo_rectangle(cr, 0, 0, 24, 24);
+  cairo_fill(cr);
+  
+  cairo_set_source_rgb(cr, 0, 0, 0);
+  cairo_rectangle(cr, 0, 0, 24, 24);
+  cairo_stroke(cr);
+
+  cairo_set_source_rgb(cr, 1, 1, 1);
+  cairo_rectangle(cr, 29, 0, 24, 24);
+  cairo_fill(cr);
+  
+  cairo_set_source_rgb(cr, 0, 0, 0);
+  cairo_rectangle(cr, 29, 0, 24, 24);
+  cairo_stroke(cr);
+  
   return FALSE;
 }
 

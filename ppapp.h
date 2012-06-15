@@ -31,6 +31,7 @@ typedef struct ppApp {
 
   GtkWidget* window;
   GtkWidget* toolbar;
+  GtkWidget* picker;
 
   guint color1;
   

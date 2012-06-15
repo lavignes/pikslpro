@@ -35,9 +35,6 @@ G_DEFINE_TYPE(ppPiksl, pp_piksl, GTK_TYPE_DRAWING_AREA);
 static gboolean pp_piksl_draw(GtkWidget* widget, cairo_t* cr) {
 
   ppPiksl* piksl = PP_PIKSL(widget);
-  
-  // Get the widget dimensions
-  gtk_widget_get_allocation(widget, &piksl->allocinfo);
 
   // Draw the background color
   cairo_set_source_rgb(cr, 

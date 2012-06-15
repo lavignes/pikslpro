@@ -27,6 +27,7 @@
 #include "ppapp.h"
 
 #include "widgets/pppiksl.h"
+#include "widgets/pppicker.h"
 
 ppApp* PP_APP = NULL;
 
@@ -65,17 +66,16 @@ void pp_app_init(int argc, char* argv[]) {
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   
   GtkWidget* piksl = pp_piksl_new(800, 600);
-  GtkWidget* alignment = gtk_alignment_new(0.5, 0.5, 0, 0);
-  gtk_alignment_set_padding(GTK_ALIGNMENT(alignment),
-                            PP_APP->canvas_padding,
-                            PP_APP->canvas_padding,
-                            PP_APP->canvas_padding,
-                            PP_APP->canvas_padding);
-  
-  gtk_container_add(GTK_CONTAINER(alignment), piksl);
+
+  gtk_widget_set_halign(piksl, GTK_ALIGN_CENTER);
+  gtk_widget_set_valign(piksl, GTK_ALIGN_CENTER);
+  gtk_widget_set_margin_top(piksl, PP_APP->canvas_padding);
+  gtk_widget_set_margin_bottom(piksl, PP_APP->canvas_padding);
+  gtk_widget_set_margin_left(piksl, PP_APP->canvas_padding);
+  gtk_widget_set_margin_right(piksl, PP_APP->canvas_padding);
   
   GtkWidget* scroller = gtk_scrolled_window_new(NULL, NULL);
-  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroller), alignment);
+  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroller), piksl);
   
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller),  GTK_POLICY_ALWAYS,  GTK_POLICY_ALWAYS);
 
@@ -102,7 +102,16 @@ void pp_app_init(int argc, char* argv[]) {
 
   GtkWidget* pane = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
   gtk_box_pack_end(GTK_BOX(vbox), pane, TRUE, TRUE, 0);
-  
+
+  PP_APP->picker = pp_picker_new();
+  gtk_widget_set_halign(PP_APP->picker, GTK_ALIGN_FILL);
+  gtk_widget_set_valign(PP_APP->picker, GTK_ALIGN_FILL);
+  gtk_widget_set_margin_top(PP_APP->picker, 10);
+  gtk_widget_set_margin_bottom(PP_APP->picker, 10);
+  gtk_widget_set_margin_left(PP_APP->picker, 10);
+  gtk_widget_set_margin_right(PP_APP->picker, 10);
+
+  gtk_paned_add1(GTK_PANED(pane), PP_APP->picker);
   gtk_paned_add2(GTK_PANED(pane), scroller);
   
   gtk_container_add(GTK_CONTAINER(PP_APP->window), vbox);

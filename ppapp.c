@@ -53,29 +53,49 @@ void pp_app_init(int argc, char* argv[]) {
   
   gtk_window_set_default_size(GTK_WINDOW(PP_APP->window), PP_APP->win_width,
                                                           PP_APP->win_height);
+
+  gtk_window_set_title(GTK_WINDOW(PP_APP->window), "PikslPro");
+    
   // Attach a watcher to track the window updates
   // this should catch resize events
   // TODO: Find better way to track resize events
   g_signal_connect(PP_APP->window, "size_allocate", G_CALLBACK(on_resize), NULL);
   
   // Create the main widgets
-  //GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   
   GtkWidget* piksl = pp_piksl_new(800, 600);
+  GtkWidget* alignment = gtk_alignment_new(0.5, 0.5, 0, 0);
+  gtk_container_add(GTK_CONTAINER(alignment), piksl);
   
   GtkWidget* scroller = gtk_scrolled_window_new(NULL, NULL);
-  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroller), piksl);
+  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroller), alignment);
   
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller),  GTK_POLICY_ALWAYS,  GTK_POLICY_ALWAYS);
-  //gtk_container_add(GTK_CONTAINER(PP_APP->window)
+
+  PP_APP->toolbar = gtk_toolbar_new();
+  // Set toolbar to primary-toolbar style
+  // This fixes the gradient!!
+  gtk_style_context_add_class(gtk_widget_get_style_context(PP_APP->toolbar),
+                              "primary-toolbar");
+
+  gtk_toolbar_insert(GTK_TOOLBAR(PP_APP->toolbar), gtk_tool_button_new_from_stock(GTK_STOCK_NEW), -1);
+  gtk_toolbar_insert(GTK_TOOLBAR(PP_APP->toolbar), gtk_tool_button_new_from_stock(GTK_STOCK_OPEN), -1);
+  gtk_toolbar_insert(GTK_TOOLBAR(PP_APP->toolbar), gtk_tool_button_new_from_stock(GTK_STOCK_SAVE), -1);
+  gtk_toolbar_insert(GTK_TOOLBAR(PP_APP->toolbar), gtk_separator_tool_item_new(), -1);
+
+  gtk_box_pack_start(GTK_BOX(vbox), PP_APP->toolbar, FALSE, FALSE, 0);
+  gtk_box_pack_end(GTK_BOX(vbox), scroller, TRUE, TRUE, 0);
   
-  gtk_container_add(GTK_CONTAINER(PP_APP->window), scroller);
+  gtk_container_add(GTK_CONTAINER(PP_APP->window), vbox);
 
   gtk_widget_show_all(PP_APP->window);
   
-  GdkWindow* gdkwin = gtk_widget_get_window(PP_APP->window);
+  GdkWindow* gdkwin = gtk_widget_get_window(piksl);
   GdkCursor* cursor = gdk_cursor_new_for_display(gdk_display_get_default(), GDK_PENCIL);
   gdk_window_set_cursor(gdkwin, cursor);
+
+  PP_APP->color1 = 0xFF000000;
   
   // Start gtk main thread
   gtk_main();

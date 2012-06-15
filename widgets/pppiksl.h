@@ -37,6 +37,9 @@
 typedef struct ppPiksl {
 
   GtkDrawingAreaClass parent;
+
+  // Used for drawing the widget
+  GtkAllocation allocinfo;
   
   int img_width;
   int img_height;
@@ -46,11 +49,8 @@ typedef struct ppPiksl {
   
   gdouble zoom;
   
-  guint color;
   // TODO: Maybe change the bg color to a pattern (eg. checkerboards)
   guint alpha_color; // "transparent" bg color
-  
-  gint tool_id;
   
   // The surface where tools are drawn to
   cairo_surface_t* tool_surface;

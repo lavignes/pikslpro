@@ -31,8 +31,8 @@ typedef struct ppApp {
 
   GtkWidget* window;
   GtkWidget* toolbar;
-  
-  GList* projects;
+
+  guint color1;
   
   // Configurable members
   int win_width;

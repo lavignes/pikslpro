@@ -34,6 +34,7 @@ ppLayer* pp_layer_new(int width, int height) {
   layer->height = height;
   
   layer->alpha = 1.0;
+  layer->visible = TRUE;
   
   layer->surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
                                                         

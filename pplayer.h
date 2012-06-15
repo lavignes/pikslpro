@@ -34,6 +34,7 @@ typedef struct ppLayer {
   int height;
   
   double alpha;
+  gboolean visible;
   
   cairo_surface_t* surface;
   gint* data;

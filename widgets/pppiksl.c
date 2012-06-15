@@ -128,10 +128,11 @@ pp_piksl_mouse_release(GtkWidget* widget, GdkEventButton* event) {
   
   if (event->button == 3) {
   
-    if (piksl->color == 0xFF000000)
-      piksl->color = 0xFFFFFFFF;
-    else
-      piksl->color = 0xFF000000;
+    gdouble zoom = PP_PIKSL(widget)->zoom;
+    
+    zoom = (zoom > 10)? 1 : zoom+0.5;
+    
+    pp_piksl_set_zoom(PP_PIKSL(widget), zoom);
   }
   
   return FALSE;
@@ -153,24 +154,46 @@ static void pp_piksl_init(ppPiksl* piksl) {
   gtk_widget_add_events(GTK_WIDGET(piksl), GDK_BUTTON_MOTION_MASK
                                            | GDK_BUTTON_PRESS_MASK
                                            | GDK_BUTTON_RELEASE_MASK);
+                   
+  piksl->img_width = 800;
+  piksl->img_height = 600;   
                                            
   piksl->lastx = -1;
   piksl->lasty = -1;
   
-  piksl->zoom = 8;
+  piksl->zoom = 1;
   
-  piksl->color = 0xFF000000;                       
+  piksl->color = 0xFF000000;
   piksl->alpha_color = 0xFFFFFFFF;
   
   piksl->layers = g_ptr_array_new();
   piksl->active_layer = 0;
   
-  g_ptr_array_add(piksl->layers, pp_layer_new(800, 600));
-
+  g_ptr_array_add(piksl->layers, pp_layer_new(piksl->img_width, piksl->img_height));
+  
+  gtk_widget_set_size_request(GTK_WIDGET(piksl),
+                              piksl->img_width*piksl->zoom,
+                              piksl->img_height*piksl->zoom);
 }
 
 GtkWidget* pp_piksl_new() {
 
   return g_object_new(PP_TYPE_PIKSL, NULL);
+}
+
+void pp_piksl_set_zoom(ppPiksl* piksl, gdouble zoom) {
+
+  if (zoom <= 0)
+    zoom = 1;
+
+  piksl->zoom = zoom;
+  
+  // Resize the widget after zoom requests
+  gtk_widget_set_size_request(GTK_WIDGET(piksl),
+                              piksl->img_width*piksl->zoom,
+                              piksl->img_height*piksl->zoom);
+                            
+  // Ask the widget to redraw itself
+  gtk_widget_queue_draw(GTK_WIDGET(piksl));
 }
 

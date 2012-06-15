@@ -58,10 +58,19 @@ void pp_app_init(int argc, char* argv[]) {
   // TODO: Find better way to track resize events
   g_signal_connect(PP_APP->window, "size_allocate", G_CALLBACK(on_resize), NULL);
   
-  GtkWidget* piksl = pp_piksl_new();
+  // Create the main widgets
+  //GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   
-  gtk_container_add(GTK_CONTAINER(PP_APP->window), piksl);
+  GtkWidget* piksl = pp_piksl_new(800, 600);
   
+  GtkWidget* scroller = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroller), piksl);
+  
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller),  GTK_POLICY_ALWAYS,  GTK_POLICY_ALWAYS);
+  //gtk_container_add(GTK_CONTAINER(PP_APP->window)
+  
+  gtk_container_add(GTK_CONTAINER(PP_APP->window), scroller);
+
   gtk_widget_show_all(PP_APP->window);
   
   GdkWindow* gdkwin = gtk_widget_get_window(PP_APP->window);

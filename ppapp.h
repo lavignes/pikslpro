@@ -30,6 +30,7 @@
 typedef struct ppApp {
 
   GtkWidget* window;
+  GtkWidget* toolbar;
   
   GList* projects;
   

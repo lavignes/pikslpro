@@ -68,4 +68,6 @@ typedef struct ppPikslClass  {
 
 GtkWidget* pp_piksl_new();
 
+void pp_piksl_set_zoom(ppPiksl* piksl, gdouble zoom);
+
 #endif /* PP_PIKSL_H */

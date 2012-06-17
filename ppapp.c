@@ -27,7 +27,6 @@
 #include "ppapp.h"
 
 #include "widgets/pppiksl.h"
-#include "widgets/pppicker.h"
 
 ppApp* PP_APP = NULL;
 
@@ -102,16 +101,59 @@ void pp_app_init(int argc, char* argv[]) {
 
   GtkWidget* pane = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
   gtk_box_pack_end(GTK_BOX(vbox), pane, TRUE, TRUE, 0);
+  
+  GtkListStore* color_list = gtk_list_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_UINT);
+  GtkWidget* view = gtk_icon_view_new_with_model(GTK_TREE_MODEL(color_list));
+  gtk_icon_view_set_columns(GTK_ICON_VIEW(view), 5);
+  gtk_icon_view_set_column_spacing(GTK_ICON_VIEW(view), 0);
+  gtk_icon_view_set_item_padding(GTK_ICON_VIEW(view), 4);
+  gtk_icon_view_set_reorderable(GTK_ICON_VIEW(view), TRUE);
+  gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(view), 0);
+  
+  GtkTreeIter iter;
+  
+  GdkPixbuf* p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
+  gdk_pixbuf_fill(p, 0x009900FF);
+  gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
+                                    0, p,
+                                    1, 0x00FF00FF,
+                                    -1);
+                                    
+  p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
+  gdk_pixbuf_fill(p, 0xFF0000FF);
+  gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
+                                    0, p,
+                                    1, 0x00FF00FF,
+                                    -1);
 
-  PP_APP->picker = pp_picker_new();
-  gtk_widget_set_halign(PP_APP->picker, GTK_ALIGN_FILL);
-  gtk_widget_set_valign(PP_APP->picker, GTK_ALIGN_FILL);
-  gtk_widget_set_margin_top(PP_APP->picker, 10);
-  gtk_widget_set_margin_bottom(PP_APP->picker, 10);
-  gtk_widget_set_margin_left(PP_APP->picker, 10);
-  gtk_widget_set_margin_right(PP_APP->picker, 10);
+  p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
+  gdk_pixbuf_fill(p, 0x0000FFFF);
+  gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
+                                    0, p,
+                                    1, 0x00FF00FF,
+                                    -1);
+                                    
+  gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
+                                    0, p,
+                                    1, 0x00FF00FF,
+                                    -1);
+                                    
+                                      gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
+                                    0, p,
+                                    1, 0x00FF00FF,
+                                    -1);
+                                    
+                                      gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
+                                    0, p,
+                                    1, 0x00FF00FF,
+                                    -1);
+                                    
+                                      gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
+                                    0, p,
+                                    1, 0x00FF00FF,
+                                    -1);
 
-  gtk_paned_add1(GTK_PANED(pane), PP_APP->picker);
+  gtk_paned_add1(GTK_PANED(pane), view);
   gtk_paned_add2(GTK_PANED(pane), scroller);
   
   gtk_container_add(GTK_CONTAINER(PP_APP->window), vbox);

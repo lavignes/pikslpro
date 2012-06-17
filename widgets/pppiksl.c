@@ -50,11 +50,8 @@ static gboolean pp_piksl_draw(GtkWidget* widget, cairo_t* cr) {
 
   // Render the graphics data...
   // Zoom the surface
-
   cairo_scale(cr, piksl->zoom, piksl->zoom);
 
-
-  
   // Render each layer
   guint i;
   ppLayer* layer = NULL;
@@ -63,6 +60,9 @@ static gboolean pp_piksl_draw(GtkWidget* widget, cairo_t* cr) {
     layer = g_ptr_array_index(piksl->layers, i);
     cairo_set_source_surface(cr, layer->surface, layer->x, layer->y);
     
+    // Disable the gaussian filtering to preserve pixels
+    cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_NEAREST);
+      
     cairo_paint(cr);
   }
   

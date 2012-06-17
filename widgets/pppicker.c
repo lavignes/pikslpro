@@ -22,51 +22,35 @@
  *
  */
 
-#include <cairo.h>
-
 #include "pppicker.h"
 #include "../ppapp.h"
 
-G_DEFINE_TYPE(ppPicker, pp_picker, GTK_TYPE_DRAWING_AREA);
+enum {
 
-static gboolean pp_picker_draw(GtkWidget* widget, cairo_t* cr) {
+  COL_IMG,
+  COL_COLOR,
+  NUM_COLUMNS
+};
 
-  ppPicker* picker = PP_PICKER(widget);
-  
-  // Get the widget dimensions
-  gtk_widget_get_allocation(widget, &picker->allocinfo);
-
-  cairo_set_source_rgb(cr, 0, 0, 0);
-  cairo_rectangle(cr, 0, 0, 24, 24);
-  cairo_fill(cr);
-  
-  cairo_set_source_rgb(cr, 0, 0, 0);
-  cairo_rectangle(cr, 0, 0, 24, 24);
-  cairo_stroke(cr);
-
-  cairo_set_source_rgb(cr, 1, 1, 1);
-  cairo_rectangle(cr, 29, 0, 24, 24);
-  cairo_fill(cr);
-  
-  cairo_set_source_rgb(cr, 0, 0, 0);
-  cairo_rectangle(cr, 29, 0, 24, 24);
-  cairo_stroke(cr);
-  
-  return FALSE;
-}
+G_DEFINE_TYPE(ppPicker, pp_picker, GTK_TYPE_ICON_VIEW);
 
 static void pp_picker_class_init(ppPickerClass* class) {
 
-  GtkWidgetClass* widget_class;
+  //GtkWidgetClass* widget_class;
 
-  widget_class = GTK_WIDGET_CLASS(class);
-
-  widget_class->draw = pp_picker_draw;
+  //widget_class = GTK_WIDGET_CLASS(class);
 }
 
 static void pp_picker_init(ppPicker* picker) {
 
-  gtk_widget_add_events(GTK_WIDGET(picker), GDK_BUTTON_PRESS_MASK);
+  picker->color_list = gtk_list_store_new(NUM_COLUMNS, GDK_TYPE_PIXBUF, G_TYPE_UINT);
+  
+  //GtkTreeIter iter;
+  //gtk_list_store_append(picker->color_list, &iter);
+  
+  gtk_icon_view_set_model(GTK_ICON_VIEW(picker), GTK_TREE_MODEL(picker->color_list));
+  gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(picker), COL_IMG);
+
 }
 
 GtkWidget* pp_picker_new() {

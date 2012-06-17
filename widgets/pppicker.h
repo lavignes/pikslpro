@@ -36,16 +36,15 @@
 
 typedef struct ppPicker {
 
-  GtkDrawingAreaClass parent;
-
-  // Used for drawing the widget
-  GtkAllocation allocinfo;
+  GtkIconViewClass parent;
+  
+  GtkListStore* color_list;
   
 } ppPicker;
 
 typedef struct ppPickerClass  {
 
-  GtkDrawingAreaClass parent_class;
+  GtkIconViewClass parent_class;
   
 } ppPickerClass;
 

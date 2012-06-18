@@ -38,6 +38,28 @@ static void on_resize(GtkWidget* widget, gpointer data) {
                                           &PP_APP->win_height);
 }
 
+static gboolean on_click(GtkWidget* widget, GdkEventButton* event) {
+
+  GtkIconView* view = GTK_ICON_VIEW(widget);
+  //GdkEventButton* button_event = GDK_EVENT_BUTTON(event);
+  GtkTreePath* path = gtk_icon_view_get_path_at_pos(view,
+                                                    event->x,
+                                                    event->y);
+                                                    
+  if (path != NULL) {
+
+    GtkTreeIter iter;
+    gtk_tree_model_get_iter(gtk_icon_view_get_model(view), &iter, path);
+    
+    guint color;
+    gtk_tree_model_get(gtk_icon_view_get_model(view), &iter, 1, &color, -1);
+    
+    PP_APP->color1 = color;
+  }
+  
+  return FALSE;
+}
+
 void pp_app_init(int argc, char* argv[]) {
 
   // Create appdata instance
@@ -82,7 +104,7 @@ void pp_app_init(int argc, char* argv[]) {
   // Set toolbar to primary-toolbar style
   // This fixes the gradient!!
   gtk_style_context_add_class(gtk_widget_get_style_context(PP_APP->toolbar),
-                              "primary-toolbar");
+                              GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
 
   gtk_toolbar_insert(GTK_TOOLBAR(PP_APP->toolbar), gtk_tool_button_new_from_stock(GTK_STOCK_NEW), -1);
   gtk_toolbar_insert(GTK_TOOLBAR(PP_APP->toolbar), gtk_tool_button_new_from_stock(GTK_STOCK_OPEN), -1);
@@ -106,9 +128,14 @@ void pp_app_init(int argc, char* argv[]) {
   GtkWidget* view = gtk_icon_view_new_with_model(GTK_TREE_MODEL(color_list));
   gtk_icon_view_set_columns(GTK_ICON_VIEW(view), 5);
   gtk_icon_view_set_column_spacing(GTK_ICON_VIEW(view), 0);
-  gtk_icon_view_set_item_padding(GTK_ICON_VIEW(view), 4);
+  gtk_icon_view_set_item_padding(GTK_ICON_VIEW(view), 2);
   gtk_icon_view_set_reorderable(GTK_ICON_VIEW(view), TRUE);
   gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(view), 0);
+  gtk_icon_view_set_selection_mode(GTK_ICON_VIEW(view), GTK_SELECTION_NONE);
+  
+  GdkRGBA color = {1, 1, 1, 1};
+  gtk_widget_override_background_color(view, GTK_STATE_FLAG_NORMAL, &color);
+                                       
   
   GtkTreeIter iter;
   
@@ -116,42 +143,38 @@ void pp_app_init(int argc, char* argv[]) {
   gdk_pixbuf_fill(p, 0x009900FF);
   gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
                                     0, p,
-                                    1, 0x00FF00FF,
+                                    1, 0xFF009900,
                                     -1);
                                     
   p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
   gdk_pixbuf_fill(p, 0xFF0000FF);
   gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
                                     0, p,
-                                    1, 0x00FF00FF,
+                                    1, 0xFFFF0000,
                                     -1);
 
   p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
   gdk_pixbuf_fill(p, 0x0000FFFF);
   gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
                                     0, p,
-                                    1, 0x00FF00FF,
+                                    1, 0xFF0000FF,
                                     -1);
-                                    
+
+  p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
+  gdk_pixbuf_fill(p, 0xFFFFFFFF);    
   gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
                                     0, p,
-                                    1, 0x00FF00FF,
+                                    1, 0xFFFFFFFF,
+                                    -1);
+
+  p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
+  gdk_pixbuf_fill(p, 0x000000FF);                
+  gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
+                                    0, p,
+                                    1, 0xFF000000,
                                     -1);
                                     
-                                      gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
-                                    0, p,
-                                    1, 0x00FF00FF,
-                                    -1);
-                                    
-                                      gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
-                                    0, p,
-                                    1, 0x00FF00FF,
-                                    -1);
-                                    
-                                      gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
-                                    0, p,
-                                    1, 0x00FF00FF,
-                                    -1);
+  g_signal_connect(view, "button-press-event", G_CALLBACK(on_click), NULL);
 
   gtk_paned_add1(GTK_PANED(pane), view);
   gtk_paned_add2(GTK_PANED(pane), scroller);

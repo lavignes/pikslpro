@@ -88,15 +88,22 @@ static gboolean pp_piksl_mouse_motion(GtkWidget* widget,
     int err = dx-dy;
     int e2 = 2*err;
     
+    int radius = 0;
+    int yy, xx;
+    
     while (TRUE) {
     
       // Write the color to the raster array
       //*(layer->data + cairo_image_surface_get_width(layer->surface)
       //* (int)(piksl->lasty/piksl->zoom)
       //+ (int)(piksl->lastx/piksl->zoom)) = PP_APP->color1;
+      for(yy=-radius; yy<=radius; yy++)
+          for(xx=-radius; xx<=radius; xx++)
+              if(xx*xx+yy*yy <= radius*radius)
+                  //setpixel(origin.x+xx, origin.y+yy);
 
-      *pp_layer_pixel(layer, (int)(piksl->lastx/piksl->zoom),
-                             (int)(piksl->lasty/piksl->zoom)) = PP_APP->color1;
+      *pp_layer_pixel(layer, (int)(piksl->lastx/piksl->zoom)+xx,
+                             (int)(piksl->lasty/piksl->zoom)+yy) = PP_APP->color1;
       
       if (piksl->lastx == (int)event->x && piksl->lasty == (int)event->y) break;
       

@@ -37,11 +37,11 @@ static gboolean pp_piksl_draw(GtkWidget* widget, cairo_t* cr) {
   ppPiksl* piksl = PP_PIKSL(widget);
 
   // Draw the background color
-  cairo_set_source_rgb(cr, 
+  cairo_set_source_rgba(cr, 
                        piksl->alpha_color & 0x00FF0000,                        
                        piksl->alpha_color & 0x0000FF00,
-                       piksl->alpha_color & 0x000000FF);
-
+                       piksl->alpha_color & 0x000000FF,
+                       piksl->alpha_color & 0xFF000000);
   
   cairo_rectangle(cr, 0, 0,
                   piksl->img_width*piksl->zoom,
@@ -88,7 +88,7 @@ static gboolean pp_piksl_mouse_motion(GtkWidget* widget,
     int err = dx-dy;
     int e2 = 2*err;
     
-    int radius = 0;
+    int radius = 5;
     int yy, xx;
     
     while (TRUE) {
@@ -135,6 +135,37 @@ static gboolean pp_piksl_mouse_motion(GtkWidget* widget,
 }
 
 static gboolean
+pp_piksl_mouse_press(GtkWidget* widget, GdkEventButton* event) {
+
+  ppPiksl* piksl = PP_PIKSL(widget);
+  
+  piksl->lastx = -1;
+  piksl->lasty = -1;
+  
+  if (event->button == 1) {
+  
+    int radius = 5;
+    int yy, xx;
+  
+    ppLayer* layer = g_ptr_array_index(piksl->layers, piksl->active_layer);
+    
+    for(yy=-radius; yy<=radius; yy++)
+        for(xx=-radius; xx<=radius; xx++)
+            if(xx*xx+yy*yy <= radius*radius)
+    *pp_layer_pixel(layer, (int)(event->x/piksl->zoom)+xx,
+                           (int)(event->y/piksl->zoom)+yy) = PP_APP->color1;
+                           
+    cairo_surface_mark_dirty(layer->surface);
+    
+    // Ask the widget to redraw itself
+    gtk_widget_queue_draw(widget);
+  
+  }
+  
+  return FALSE;
+}
+
+static gboolean
 pp_piksl_mouse_release(GtkWidget* widget, GdkEventButton* event) {
 
   ppPiksl* piksl = PP_PIKSL(widget);
@@ -163,6 +194,7 @@ static void pp_piksl_class_init(ppPikslClass* class) {
   widget_class->draw = pp_piksl_draw;
   widget_class->motion_notify_event = pp_piksl_mouse_motion;
   widget_class->button_release_event = pp_piksl_mouse_release;
+  widget_class->button_press_event = pp_piksl_mouse_press;
 }
 
 static void pp_piksl_init(ppPiksl* piksl) {

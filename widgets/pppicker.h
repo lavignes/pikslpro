@@ -18,29 +18,27 @@
  *
  * @section DESCRIPTION
  *
- * A widget for smart color picking
+ * A color square widget
  *
  */
 
-#ifndef PP_PICKER_H
-#define PP_PICKER_H
+#ifndef PP_SQUARE_H
+#define PP_SQUARE_H
 
 #include <gtk/gtk.h>
 
-#define PP_TYPE_PICKER             (pp_picker_get_type())
-#define PP_PICKER(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), PP_TYPE_PICKER, ppPicker))
-#define PP_PICKER_CLASS(obj)       (G_TYPE_CHECK_CLASS_CAST ((obj), PP_PICKER, ppPickerClass))
-#define PP_IS_PICKER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PP_TYPE_PICKER))
-#define PP_IS_PICKER_CLASS(obj)    (G_TYPE_CHECK_CLASS_TYPE ((obj), PP_TYPE_PICKER))
-#define PP_PICKER_GET_CLASS        (G_TYPE_INSTANCE_GET_CLASS ((obj), PP_TYPE_PICKER, ppPickerClass))
+#define PP_TYPE_SQUARE             (pp_picker_get_type())
+#define PP_SQUARE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), PP_TYPE_SQUARE, ppSquare))
+#define PP_SQUARE_CLASS(obj)       (G_TYPE_CHECK_CLASS_CAST ((obj), PP_SQUARE, ppSquareClass))
+#define PP_IS_SQUARE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PP_TYPE_SQUARE))
+#define PP_IS_SQUARE_CLASS(obj)    (G_TYPE_CHECK_CLASS_TYPE ((obj), PP_TYPE_SQUARE))
+#define PP_SQUARE_GET_CLASS        (G_TYPE_INSTANCE_GET_CLASS ((obj), PP_TYPE_SQUARE, ppSquareClass))
 
-typedef struct ppPicker {
+typedef struct ppSquare {
 
-  GtkIconViewClass parent;
+  GdkPixbuf parent;
   
-  GtkListStore* color_list;
-  
-} ppPicker;
+} ppSquare;
 
 typedef struct ppPickerClass  {
 

@@ -21,11 +21,13 @@
  * Contains all information for a single instance of pikslpro to run.
  *
  */
+ 
+#include <string.h>
 
 #include <jemalloc/jemalloc.h>
 
 #include "ppapp.h"
-
+#include "pputil.h"
 #include "widgets/pppiksl.h"
 
 ppApp* PP_APP = NULL;
@@ -54,10 +56,30 @@ static gboolean on_click(GtkWidget* widget, GdkEventButton* event) {
     guint color;
     gtk_tree_model_get(gtk_icon_view_get_model(view), &iter, 1, &color, -1);
     
-    PP_APP->color1 = color;
+    pp_app_set_color(color);
   }
   
   return FALSE;
+}
+
+static void on_color(GtkRange* range, gpointer data) {
+
+  if (!strcmp((gchar*)data, "red")) {
+
+    pp_app_set_red((guint)gtk_range_get_value(range));
+  
+  } else if (!strcmp((gchar*)data, "green")) {
+
+    pp_app_set_green((guint)gtk_range_get_value(range));
+    
+  } else if (!strcmp((gchar*)data, "blue")) {
+
+    pp_app_set_blue((guint)gtk_range_get_value(range));
+  
+  } else if (!strcmp((gchar*)data, "alpha")) {
+
+    pp_app_set_alpha((guint)gtk_range_get_value(range));
+  }
 }
 
 void pp_app_init(int argc, char* argv[]) {
@@ -124,59 +146,63 @@ void pp_app_init(int argc, char* argv[]) {
   GtkWidget* pane = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
   gtk_box_pack_end(GTK_BOX(vbox), pane, TRUE, TRUE, 0);
   
-  GtkListStore* color_list = gtk_list_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_UINT);
-  GtkWidget* view = gtk_icon_view_new_with_model(GTK_TREE_MODEL(color_list));
+  PP_APP->color_list = gtk_list_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_UINT);
+  GtkWidget* view = gtk_icon_view_new_with_model(GTK_TREE_MODEL(PP_APP->color_list));
   gtk_icon_view_set_columns(GTK_ICON_VIEW(view), 5);
   gtk_icon_view_set_column_spacing(GTK_ICON_VIEW(view), 0);
   gtk_icon_view_set_item_padding(GTK_ICON_VIEW(view), 2);
   gtk_icon_view_set_reorderable(GTK_ICON_VIEW(view), TRUE);
   gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(view), 0);
   gtk_icon_view_set_selection_mode(GTK_ICON_VIEW(view), GTK_SELECTION_NONE);
-  
-  GdkRGBA color = {1, 1, 1, 1};
-  gtk_widget_override_background_color(view, GTK_STATE_FLAG_NORMAL, &color);
-                                       
-  
-  GtkTreeIter iter;
-  
-  GdkPixbuf* p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
-  gdk_pixbuf_fill(p, 0x009900FF);
-  gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
-                                    0, p,
-                                    1, 0xFF009900,
-                                    -1);
-                                    
-  p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
-  gdk_pixbuf_fill(p, 0xFF0000FF);
-  gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
-                                    0, p,
-                                    1, 0xFFFF0000,
-                                    -1);
-
-  p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
-  gdk_pixbuf_fill(p, 0x0000FFFF);
-  gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
-                                    0, p,
-                                    1, 0xFF0000FF,
-                                    -1);
-
-  p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
-  gdk_pixbuf_fill(p, 0xFFFFFFFF);    
-  gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
-                                    0, p,
-                                    1, 0xFFFFFFFF,
-                                    -1);
-
-  p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
-  gdk_pixbuf_fill(p, 0x000000FF);                
-  gtk_list_store_insert_with_values(GTK_LIST_STORE(color_list), &iter, -1,
-                                    0, p,
-                                    1, 0xFF000000,
-                                    -1);
-                                    
   g_signal_connect(view, "button-press-event", G_CALLBACK(on_click), NULL);
+                                       
+  pp_app_add_color(0xFF000000);
+  pp_app_add_color(0xFFFFFFFF);
+  pp_app_add_color(0xFFFF0000);
+  pp_app_add_color(0xFF00FF00);
+  pp_app_add_color(0xFF0000FF);
+  pp_app_add_color(0xFFFFFF00);
+  pp_app_add_color(0xFFFF00FF);
+  pp_app_add_color(0xFF00FFFF);
+  
+  GtkWidget* toolbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  
+  gtk_box_pack_start(GTK_BOX(toolbox), view, FALSE, FALSE, 0);
 
-  gtk_paned_add1(GTK_PANED(pane), view);
+  PP_APP->red_scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL,
+                                               0,
+                                               255,
+                                               1);
+  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->red_scale), FALSE);
+  g_signal_connect(PP_APP->red_scale, "value-changed", G_CALLBACK(on_color), "red");
+                                            
+  PP_APP->green_scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL,
+                                                 0,
+                                                 255,
+                                                 1);
+  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->green_scale), FALSE);
+  g_signal_connect(PP_APP->green_scale, "value-changed", G_CALLBACK(on_color), "green");
+                                          
+  PP_APP->blue_scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL,
+                                                0,
+                                                255,
+                                                1);
+  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->blue_scale), FALSE);
+  g_signal_connect(PP_APP->blue_scale, "value-changed", G_CALLBACK(on_color), "blue");
+  
+  PP_APP->alpha_scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL,
+                                                 0,
+                                                 255,
+                                                 1);
+  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->alpha_scale), FALSE);
+  g_signal_connect(PP_APP->alpha_scale, "value-changed", G_CALLBACK(on_color), "alpha");
+                                             
+  gtk_box_pack_start(GTK_BOX(toolbox), PP_APP->red_scale, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(toolbox), PP_APP->green_scale, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(toolbox), PP_APP->blue_scale, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(toolbox), PP_APP->alpha_scale, FALSE, FALSE, 0);
+
+  gtk_paned_add1(GTK_PANED(pane), toolbox);
   gtk_paned_add2(GTK_PANED(pane), scroller);
   
   gtk_container_add(GTK_CONTAINER(PP_APP->window), vbox);
@@ -187,10 +213,40 @@ void pp_app_init(int argc, char* argv[]) {
   GdkCursor* cursor = gdk_cursor_new_for_display(gdk_display_get_default(), GDK_PENCIL);
   gdk_window_set_cursor(gdkwin, cursor);
 
-  PP_APP->color1 = 0xFF000000;
+  pp_app_set_color(0xFF000000);
   
   // Start gtk main thread
   gtk_main();
+}
+
+void pp_app_add_color(guint color) {
+
+  GtkTreeIter iter;
+  guint c;
+  
+  // Make sure there are no duplicates
+  // Iterate through liststore to prevent color dplicates
+  if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(PP_APP->color_list), &iter)) {
+    do {
+      gtk_tree_model_get(GTK_TREE_MODEL(PP_APP->color_list), &iter, 1, &c, -1);
+      
+      if (c == color)
+        return;
+    } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(PP_APP->color_list), &iter));
+  }
+
+  GdkPixbuf* p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
+  pp_color_pixbuf(p, color);
+ 
+  gtk_list_store_insert_with_values(GTK_LIST_STORE(PP_APP->color_list), &iter, -1,
+                                  0, p,
+                                  1, color,
+                                  -1);
+}
+
+void pp_app_set_color(guint color) {
+
+  PP_APP->color1 = color;
 }
 
 void pp_app_loadconfig() {

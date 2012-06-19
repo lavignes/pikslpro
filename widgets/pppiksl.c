@@ -29,19 +29,15 @@
 #include "pppiksl.h"
 #include "../pplayer.h"
 #include "../ppapp.h"
+#include "../pputil.h"
 
 G_DEFINE_TYPE(ppPiksl, pp_piksl, GTK_TYPE_DRAWING_AREA);
 
 static gboolean pp_piksl_draw(GtkWidget* widget, cairo_t* cr) {
 
   ppPiksl* piksl = PP_PIKSL(widget);
-
-  // Draw the background color
-  cairo_set_source_rgba(cr, 
-                       piksl->alpha_color & 0x00FF0000,                        
-                       piksl->alpha_color & 0x0000FF00,
-                       piksl->alpha_color & 0x000000FF,
-                       piksl->alpha_color & 0xFF000000);
+                        
+  cairo_set_source(cr, PP_APP->checker);
   
   cairo_rectangle(cr, 0, 0,
                   piksl->img_width*piksl->zoom,
@@ -88,9 +84,9 @@ static gboolean pp_piksl_mouse_motion(GtkWidget* widget,
     int err = dx-dy;
     int e2 = 2*err;
     
-    int radius = 5;
+    int radius = 2;
     int yy, xx;
-    
+   
     while (TRUE) {
     
       // Write the color to the raster array
@@ -144,7 +140,7 @@ pp_piksl_mouse_press(GtkWidget* widget, GdkEventButton* event) {
   
   if (event->button == 1) {
   
-    int radius = 5;
+    int radius = 2;
     int yy, xx;
   
     ppLayer* layer = g_ptr_array_index(piksl->layers, piksl->active_layer);
@@ -210,8 +206,6 @@ static void pp_piksl_init(ppPiksl* piksl) {
   piksl->lasty = -1;
   
   piksl->zoom = 1;
-  
-  piksl->alpha_color = 0xFFFFFFFF;
   
   piksl->layers = g_ptr_array_new();
   piksl->active_layer = 0;

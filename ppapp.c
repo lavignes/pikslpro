@@ -64,22 +64,13 @@ static gboolean on_click(GtkWidget* widget, GdkEventButton* event) {
 
 static void on_color(GtkRange* range, gpointer data) {
 
-  if (!strcmp((gchar*)data, "red")) {
-
-    pp_app_set_red((guint)gtk_range_get_value(range));
+  ppColor c;
+  c.argb.r = gtk_range_get_value(GTK_RANGE(PP_APP->red_scale));
+  c.argb.g = gtk_range_get_value(GTK_RANGE(PP_APP->green_scale));
+  c.argb.b = gtk_range_get_value(GTK_RANGE(PP_APP->blue_scale));
+  c.argb.a = gtk_range_get_value(GTK_RANGE(PP_APP->alpha_scale));
   
-  } else if (!strcmp((gchar*)data, "green")) {
-
-    pp_app_set_green((guint)gtk_range_get_value(range));
-    
-  } else if (!strcmp((gchar*)data, "blue")) {
-
-    pp_app_set_blue((guint)gtk_range_get_value(range));
-  
-  } else if (!strcmp((gchar*)data, "alpha")) {
-
-    pp_app_set_alpha((guint)gtk_range_get_value(range));
-  }
+  pp_app_set_color(c.color);
 }
 
 void pp_app_init(int argc, char* argv[]) {
@@ -104,6 +95,9 @@ void pp_app_init(int argc, char* argv[]) {
   // this should catch resize events
   // TODO: Find better way to track resize events
   g_signal_connect(PP_APP->window, "size_allocate", G_CALLBACK(on_resize), NULL);
+  
+  // Create the checkerboard pattern
+  PP_APP->checker = pp_cairo_checkerboard();
   
   // Create the main widgets
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -155,15 +149,6 @@ void pp_app_init(int argc, char* argv[]) {
   gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(view), 0);
   gtk_icon_view_set_selection_mode(GTK_ICON_VIEW(view), GTK_SELECTION_NONE);
   g_signal_connect(view, "button-press-event", G_CALLBACK(on_click), NULL);
-                                       
-  pp_app_add_color(0xFF000000);
-  pp_app_add_color(0xFFFFFFFF);
-  pp_app_add_color(0xFFFF0000);
-  pp_app_add_color(0xFF00FF00);
-  pp_app_add_color(0xFF0000FF);
-  pp_app_add_color(0xFFFFFF00);
-  pp_app_add_color(0xFFFF00FF);
-  pp_app_add_color(0xFF00FFFF);
   
   GtkWidget* toolbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   
@@ -173,34 +158,48 @@ void pp_app_init(int argc, char* argv[]) {
                                                0,
                                                255,
                                                1);
-  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->red_scale), FALSE);
+  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->red_scale), TRUE);
+  gtk_scale_set_value_pos(GTK_SCALE(PP_APP->red_scale), GTK_POS_LEFT);
   g_signal_connect(PP_APP->red_scale, "value-changed", G_CALLBACK(on_color), "red");
                                             
   PP_APP->green_scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL,
                                                  0,
                                                  255,
                                                  1);
-  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->green_scale), FALSE);
+  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->green_scale), TRUE);
+  gtk_scale_set_value_pos(GTK_SCALE(PP_APP->green_scale), GTK_POS_LEFT);
   g_signal_connect(PP_APP->green_scale, "value-changed", G_CALLBACK(on_color), "green");
                                           
   PP_APP->blue_scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL,
                                                 0,
                                                 255,
                                                 1);
-  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->blue_scale), FALSE);
+  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->blue_scale), TRUE);
+  gtk_scale_set_value_pos(GTK_SCALE(PP_APP->blue_scale), GTK_POS_LEFT);
   g_signal_connect(PP_APP->blue_scale, "value-changed", G_CALLBACK(on_color), "blue");
   
   PP_APP->alpha_scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL,
                                                  0,
                                                  255,
                                                  1);
-  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->alpha_scale), FALSE);
+  gtk_scale_set_draw_value(GTK_SCALE(PP_APP->alpha_scale), TRUE);
+  gtk_scale_set_value_pos(GTK_SCALE(PP_APP->alpha_scale), GTK_POS_LEFT);
   g_signal_connect(PP_APP->alpha_scale, "value-changed", G_CALLBACK(on_color), "alpha");
                                              
   gtk_box_pack_start(GTK_BOX(toolbox), PP_APP->red_scale, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(toolbox), PP_APP->green_scale, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(toolbox), PP_APP->blue_scale, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(toolbox), PP_APP->alpha_scale, FALSE, FALSE, 0);
+  
+  GtkWidget* color_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  
+  GdkPixbuf* p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 64, 64);
+  pp_color_pixbuf(p, 0x80FF0000);
+  PP_APP->color_image = gtk_image_new_from_pixbuf(p);
+
+  gtk_box_pack_start(GTK_BOX(color_box), PP_APP->color_image, FALSE, FALSE, 0);
+  
+  gtk_box_pack_start(GTK_BOX(toolbox), color_box, FALSE, FALSE, 0);
 
   gtk_paned_add1(GTK_PANED(pane), toolbox);
   gtk_paned_add2(GTK_PANED(pane), scroller);
@@ -213,13 +212,23 @@ void pp_app_init(int argc, char* argv[]) {
   GdkCursor* cursor = gdk_cursor_new_for_display(gdk_display_get_default(), GDK_PENCIL);
   gdk_window_set_cursor(gdkwin, cursor);
 
-  pp_app_set_color(0xFF000000);
+  pp_app_set_color(0x80FF0000);
+  
+  pp_app_add_color(0x80FF0000);
+  pp_app_add_color(0xFF000000);
+  pp_app_add_color(0xFFFFFFFF);
+  pp_app_add_color(0x00000000);
+  pp_app_add_color(0x80000000);
+  pp_app_add_color(0x800000FF);
   
   // Start gtk main thread
   gtk_main();
 }
 
 void pp_app_add_color(guint color) {
+
+  // Premultiply the color
+  guint mcolor = pp_color_premultiply((ppColor)color).color;
 
   GtkTreeIter iter;
   guint c;
@@ -236,7 +245,8 @@ void pp_app_add_color(guint color) {
   }
 
   GdkPixbuf* p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 24, 24);
-  pp_color_pixbuf(p, color);
+  
+  pp_color_pixbuf(p, mcolor);
  
   gtk_list_store_insert_with_values(GTK_LIST_STORE(PP_APP->color_list), &iter, -1,
                                   0, p,
@@ -246,7 +256,20 @@ void pp_app_add_color(guint color) {
 
 void pp_app_set_color(guint color) {
 
-  PP_APP->color1 = color;
+  guint mcolor = pp_color_premultiply((ppColor)color).color;
+
+  PP_APP->color1 = mcolor;
+  
+  pp_color_pixbuf(gtk_image_get_pixbuf(GTK_IMAGE(PP_APP->color_image)), mcolor);
+  // Ask the widget to redraw itself
+  gtk_widget_queue_draw(PP_APP->color_image);
+  
+  ppColor c = (ppColor)color;
+  
+  gtk_range_set_value(GTK_RANGE(PP_APP->red_scale), c.argb.r);
+  gtk_range_set_value(GTK_RANGE(PP_APP->green_scale), c.argb.g);
+  gtk_range_set_value(GTK_RANGE(PP_APP->blue_scale), c.argb.b);
+  gtk_range_set_value(GTK_RANGE(PP_APP->alpha_scale), c.argb.a);
 }
 
 void pp_app_loadconfig() {

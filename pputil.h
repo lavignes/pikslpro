@@ -27,10 +27,30 @@
 
 #include <gtk/gtk.h>
 
+typedef union ppColor {
+
+  guint color;
+  
+  struct {
+  
+    guchar b;
+    guchar g;
+    guchar r;
+    guchar a;
+    
+  } argb;
+  
+} ppColor;
+
 guint rgba2argb(guint color);
 
 guint argb2rgba(guint color);
 
+ppColor pp_color_premultiply(ppColor color);
+ppColor pp_color_unmultiply(ppColor color);
+
 void pp_color_pixbuf(GdkPixbuf* pb, guint color);
+void pp_cairo_roundrect(cairo_t* cr, gint x, gint y, gint width, gint height, gint radius);
+cairo_pattern_t* pp_cairo_checkerboard();
 
 #endif /* PP_UTILITY */

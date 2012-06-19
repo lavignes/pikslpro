@@ -46,9 +46,6 @@ typedef struct ppPiksl {
   
   gdouble zoom;
   
-  // TODO: Maybe change the bg color to a pattern (eg. checkerboards)
-  guint alpha_color; // "transparent" bg color
-  
   // The surface where tools are drawn to
   cairo_surface_t* tool_surface;
  

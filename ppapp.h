@@ -37,6 +37,10 @@ typedef struct ppApp {
   GtkWidget* green_scale;
   GtkWidget* blue_scale;
   GtkWidget* alpha_scale;
+  
+  GtkWidget* color_image;
+  
+  cairo_pattern_t* checker;
 
   guint color1;
   
@@ -50,13 +54,10 @@ typedef struct ppApp {
 extern ppApp* PP_APP;
 
 void pp_app_init(int argc, char* argv[]);
+
+// These take non-multiplied argb colors
 void pp_app_add_color(guint color);
 void pp_app_set_color(guint color);
-
-#define pp_app_set_red(r) pp_app_set_color((PP_APP->color1 & 0xFF00FFFF) | (r << 16))
-#define pp_app_set_green(g) pp_app_set_color((PP_APP->color1 & 0xFFFF00FF) | (g << 8))
-#define pp_app_set_blue(b) pp_app_set_color((PP_APP->color1 & 0xFFFFFF00) | (b << 0))
-#define pp_app_set_alpha(a) pp_app_set_color((PP_APP->color1 & 0x00FFFFFF) | (a << 24))
 
 void pp_app_saveconfig();
 void pp_app_loadconfig();

@@ -62,6 +62,17 @@ static gboolean on_click(GtkWidget* widget, GdkEventButton* event) {
   return FALSE;
 }
 
+static void on_add(GtkButton* button, gpointer data) {
+
+  ppColor c;
+  c.argb.r = gtk_range_get_value(GTK_RANGE(PP_APP->red_scale));
+  c.argb.g = gtk_range_get_value(GTK_RANGE(PP_APP->green_scale));
+  c.argb.b = gtk_range_get_value(GTK_RANGE(PP_APP->blue_scale));
+  c.argb.a = gtk_range_get_value(GTK_RANGE(PP_APP->alpha_scale));
+  
+  pp_app_add_color(c.color);
+}
+
 static void on_color(GtkRange* range, gpointer data) {
 
   ppColor c;
@@ -97,7 +108,7 @@ void pp_app_init(int argc, char* argv[]) {
   g_signal_connect(PP_APP->window, "size_allocate", G_CALLBACK(on_resize), NULL);
   
   // Create the checkerboard pattern
-  PP_APP->checker = pp_cairo_checkerboard();
+  PP_APP->checker = pp_cairo_checkerboard(PP_APP->checker_size);
   
   // Create the main widgets
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -142,12 +153,13 @@ void pp_app_init(int argc, char* argv[]) {
   
   PP_APP->color_list = gtk_list_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_UINT);
   GtkWidget* view = gtk_icon_view_new_with_model(GTK_TREE_MODEL(PP_APP->color_list));
-  gtk_icon_view_set_columns(GTK_ICON_VIEW(view), 5);
+  gtk_icon_view_set_columns(GTK_ICON_VIEW(view), 8);
   gtk_icon_view_set_column_spacing(GTK_ICON_VIEW(view), 0);
   gtk_icon_view_set_item_padding(GTK_ICON_VIEW(view), 2);
   gtk_icon_view_set_reorderable(GTK_ICON_VIEW(view), TRUE);
   gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(view), 0);
   gtk_icon_view_set_selection_mode(GTK_ICON_VIEW(view), GTK_SELECTION_NONE);
+  gtk_widget_set_halign(view, GTK_ALIGN_CENTER);
   g_signal_connect(view, "button-press-event", G_CALLBACK(on_click), NULL);
   
   GtkWidget* toolbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -192,6 +204,7 @@ void pp_app_init(int argc, char* argv[]) {
   gtk_box_pack_start(GTK_BOX(toolbox), PP_APP->alpha_scale, FALSE, FALSE, 0);
   
   GtkWidget* color_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_widget_set_halign(color_box, GTK_ALIGN_CENTER);
   
   GdkPixbuf* p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 64, 64);
   pp_color_pixbuf(p, 0x80FF0000);
@@ -199,9 +212,18 @@ void pp_app_init(int argc, char* argv[]) {
 
   gtk_box_pack_start(GTK_BOX(color_box), PP_APP->color_image, FALSE, FALSE, 0);
   
-  gtk_box_pack_start(GTK_BOX(toolbox), color_box, FALSE, FALSE, 0);
+  GtkWidget* color_add = gtk_button_new_from_stock(GTK_STOCK_ADD);
+  gtk_widget_set_valign(color_add, GTK_ALIGN_CENTER);
+  g_signal_connect(color_add, "clicked", G_CALLBACK(on_add), NULL);
+  gtk_box_pack_start(GTK_BOX(color_box), color_add, FALSE, FALSE, 0);
+  
+  gtk_box_pack_start(GTK_BOX(toolbox), color_box, FALSE, FALSE, 16);
 
-  gtk_paned_add1(GTK_PANED(pane), toolbox);
+  GtkWidget* frame = gtk_frame_new(NULL);
+  gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
+  gtk_container_add(GTK_CONTAINER(frame), toolbox);
+  
+  gtk_paned_add1(GTK_PANED(pane), frame);
   gtk_paned_add2(GTK_PANED(pane), scroller);
   
   gtk_container_add(GTK_CONTAINER(PP_APP->window), vbox);
@@ -213,6 +235,7 @@ void pp_app_init(int argc, char* argv[]) {
   gdk_window_set_cursor(gdkwin, cursor);
 
   pp_app_set_color(0x80FF0000);
+  PP_APP->pen_radius = 2;
   
   pp_app_add_color(0x80FF0000);
   pp_app_add_color(0xFF000000);
@@ -316,6 +339,9 @@ void pp_app_loadconfig() {
 
   PP_APP->canvas_padding =
     g_key_file_get_integer(configfile, "pikslpro", "canvas_padding", NULL);
+    
+  PP_APP->checker_size =
+    g_key_file_get_integer(configfile, "pikslpro", "checker_size", NULL);
   
   // cleanup :3
   g_string_free(configpath, TRUE);

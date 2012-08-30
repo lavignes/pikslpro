@@ -112,24 +112,24 @@ void pp_cairo_roundrect(cairo_t* cr, gint x, gint y, gint w, gint h, gint r) {
     cairo_curve_to(cr, x, y, x, y, x + r, y);
 }
 
-cairo_pattern_t* pp_cairo_checkerboard() {
+cairo_pattern_t* pp_cairo_checkerboard(gint size) {
 
   cairo_t* context;
   cairo_surface_t* surface;
   cairo_pattern_t* pattern;
   
-  surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
+  surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 24, 24);
   
   context = cairo_create(surface);
   
   cairo_set_source_rgb(context, 0.6, 0.6, 0.6);
-  cairo_rectangle(context, 0, 0, 16, 16);
-  cairo_rectangle(context, 16, 16, 16, 16);
+  cairo_rectangle(context, 0, 0, size, size);
+  cairo_rectangle(context, size, size, size, size);
   cairo_fill(context);
   
   cairo_set_source_rgb(context, 0.4, 0.4, 0.4);
-  cairo_rectangle(context, 16, 0, 16, 16);
-  cairo_rectangle(context, 0, 16, 16, 16);
+  cairo_rectangle(context, size, 0, size, size);
+  cairo_rectangle(context, 0, size, size, size);
   cairo_fill(context);
   
   cairo_destroy(context);

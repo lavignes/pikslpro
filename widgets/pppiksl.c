@@ -84,7 +84,7 @@ static gboolean pp_piksl_mouse_motion(GtkWidget* widget,
     int err = dx-dy;
     int e2 = 2*err;
     
-    int radius = 2;
+    int radius = PP_APP->pen_radius;
     int yy, xx;
    
     while (TRUE) {
@@ -140,7 +140,7 @@ pp_piksl_mouse_press(GtkWidget* widget, GdkEventButton* event) {
   
   if (event->button == 1) {
   
-    int radius = 2;
+    int radius = PP_APP->pen_radius;
     int yy, xx;
   
     ppLayer* layer = g_ptr_array_index(piksl->layers, piksl->active_layer);

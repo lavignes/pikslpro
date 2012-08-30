@@ -43,11 +43,13 @@ typedef struct ppApp {
   cairo_pattern_t* checker;
 
   guint color1;
+  guint pen_radius;
   
   // Configurable members
   int win_width;
   int win_height;
   int canvas_padding;
+  int checker_size;
   
 } ppApp;
 
